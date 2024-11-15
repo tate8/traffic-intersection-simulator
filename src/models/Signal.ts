@@ -1,15 +1,19 @@
-export default class Signal {
-  private observers: Function[] = [];
+/**
+ * The Signal class can be emitted to call a specified
+ * function on all of its observers
+ */
+export default class Signal<T> {
+  private observers: ((arg: T) => void)[] = [];
 
-  connect(callback: Function) {
+  connect(callback: (arg: T) => void) {
     this.observers.push(callback);
   }
 
-  disconnect(callback: Function) {
+  disconnect(callback: (arg: T) => void) {
     this.observers.filter(e => e != callback);
  }
 
-  emit(...args: any[]) {
-    this.observers.forEach(e => e(...args));
+  emit(arg: T) {
+    this.observers.forEach(e => e(arg));
   }
 }

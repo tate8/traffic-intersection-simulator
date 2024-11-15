@@ -3,5 +3,14 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "target": "es6", // or "esnext"
+    "module": "commonjs", // or "esnext" depending on your module system
+    "lib": ["es2015", "dom"], // Add es2015 or esnext for modern JavaScript
+    "esModuleInterop": true,
+    "skipLibCheck": true,  // Optional, skips type-checking of declaration files
+    "strict": true,         // Optional, enables strict type checking
+    "outDir": "./dist"
+  }
 }
