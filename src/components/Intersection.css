@@ -1,0 +1,60 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 500px;
+  height: 500px;
+}
+
+.grid-item {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+}
+
+.grid-item:nth-child(1) {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+.grid-item:nth-child(3) {
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+.grid-item:nth-child(7) {
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+}
+
+.grid-item:nth-child(9) {
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+}
+
+.grid-item:nth-child(5) {
+  position: relative;
+}
+
+.NB-light {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.SB-light {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+.EB-light {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.WB-light {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

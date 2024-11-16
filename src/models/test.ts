@@ -9,14 +9,23 @@ ih.sensorChange({
   sensor: "NS",
 })
 
-ih.sensorChange({
-  leftLaneActive: true,
-  anyPrimaryLanesActive: false,
-  sensor: "NS",
-})
+// ih.sensorChange({
+//   leftLaneActive: true,
+//   anyPrimaryLanesActive: false,
+//   sensor: "NS",
+// })
+
+setTimeout(() => {
+  ih.sensorChange({
+    leftLaneActive: false,
+    anyPrimaryLanesActive: true,
+    sensor: "EW",
+  })
+}, 5000)
 
 ih.sensorChange({
   leftLaneActive: false,
   anyPrimaryLanesActive: true,
   sensor: "NS",
 })
+

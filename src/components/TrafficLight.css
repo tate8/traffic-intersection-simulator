@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+}
+
+.swap {
+  flex-direction: column;
+}
+
+.swap .primary {
+  width: 15px;
+  height: 40px;
+}
+
+.primary {
+  width: 40px;
+  height: 15px;
+  background-color: gray;
+}
+
+.left {
+  width: 15px;
+  height: 15px;
+  background-color: gray;
+}
+
+.green {
+  background-color: green;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.red {
+  background-color: red;
+}

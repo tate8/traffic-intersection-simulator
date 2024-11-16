@@ -3,8 +3,9 @@ import Signal from "./Signal"
 import { SensorState } from "./SensorState"
 
 export default class IntersectionHandler {
-  private MIN_GREEN_DURATION = 5000
+  private GREEN_DURATION = 5000
   private YELLOW_DURATION = 1000
+  private IN_BETWEEN_DURATION = 1000
 
   private currentPhase: LightState | null = null
   private pendingPhases: LightState[] = []
@@ -27,7 +28,6 @@ export default class IntersectionHandler {
   public sensorChange(state: SensorState) {
     let nextPhase = this.determineNextPhase(state)
     if (nextPhase === null) return;
-    
 
     // if there are no actions in progress, add the new one and schedule it
     // to be executed immediately
@@ -74,7 +74,7 @@ export default class IntersectionHandler {
   private startNewPhase(phase: LightState) {
     this.currentPhase = phase
     this.onLightChange.emit(phase)
-    setTimeout(() => this.transitionToYellow(), this.MIN_GREEN_DURATION)
+    setTimeout(() => this.transitionToYellow(), this.GREEN_DURATION)
   }
 
   private queuePhase(phase: LightState): void {
@@ -116,12 +116,19 @@ export default class IntersectionHandler {
   private endCurrentPhase(): void {
     if (!this.currentPhase) return
 
-    if (this.pendingPhases.length > 0) {
-      const nextPhase = this.pendingPhases.shift()!;
-      this.startNewPhase(nextPhase);
-    } else {
-      this.currentPhase = { ...this.initialLightState };
-      this.onLightChange.emit(this.currentPhase);
-    }
+    // set to all red for a while
+    this.currentPhase = { ...this.initialLightState };
+    this.onLightChange.emit(this.currentPhase);
+
+    setTimeout(() => {
+      if (this.pendingPhases.length > 0) {
+        const nextPhase = this.pendingPhases.shift()!;
+        this.startNewPhase(nextPhase);
+      } else {
+        this.currentPhase = { ...this.initialLightState };
+        this.onLightChange.emit(this.currentPhase);
+        this.currentPhase = null
+      }
+    }, this.IN_BETWEEN_DURATION)
   }
 }
