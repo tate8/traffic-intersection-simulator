@@ -3,29 +3,9 @@ import IntersectionHandler from "./IntersectionHandler"
 let ih = new IntersectionHandler()
 ih.onLightChange.connect((s) => console.log(`Light Change:\n${JSON.stringify(s, null, 2)}`))
 
-ih.sensorChange({
-  leftLaneActive: true,
-  anyPrimaryLanesActive: false,
-  sensor: "NS",
-})
+// ih.sensorChange("north_straight", true)
+// ih.sensorChange("north_left", true)
+// ih.sensorChange("south_straight", true)
 
-// ih.sensorChange({
-//   leftLaneActive: true,
-//   anyPrimaryLanesActive: false,
-//   sensor: "NS",
-// })
-
-setTimeout(() => {
-  ih.sensorChange({
-    leftLaneActive: false,
-    anyPrimaryLanesActive: true,
-    sensor: "EW",
-  })
-}, 5000)
-
-ih.sensorChange({
-  leftLaneActive: false,
-  anyPrimaryLanesActive: true,
-  sensor: "NS",
-})
-
+ih.sensorChange("north_straight", true)
+ih.sensorChange("pedestrian_east", true)
