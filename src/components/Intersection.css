@@ -118,7 +118,7 @@ html {
 .WB-traffic-sensors {
   position: absolute;
   left: 0;
-  top: 60%;
+  top: 50%;
   font-size: 30px;
   transform-origin: top left;
   transform: rotate(-90deg);

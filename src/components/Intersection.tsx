@@ -7,27 +7,22 @@ import IntersectionHandler, {
 
 const intersection = new IntersectionHandler();
 
-type ButtonConfig = {
-  sensor: "NS" | "EW";
-  leftLaneActive: boolean;
-  anyPrimaryLanesActive: boolean;
-  icon: string;
-  condition?: "red" | "green" | "yellow";
-};
-
+/**
+ * This component models the view of a traffic intersection. It uses a 3x3
+ * grid with checkboxes by different components for user interaction.
+ * It sends inputs to the IntersectionHandler and listens for changes.
+ */
 function Intersection() {
   const [lightState, setLightState] = useState<LightStates | null>(null);
 
+  // subscribe to onLightChange events
   useEffect(() => {
-    // Define the callback function
     const handleLightChange = (s: LightStates) => {
       setLightState(s);
     };
 
-    // Connect to state changes with the callback
     intersection.onLightChange.connect(handleLightChange);
 
-    // Cleanup with the same callback reference
     return () => {
       intersection.onLightChange.disconnect(handleLightChange);
     };
@@ -42,6 +37,7 @@ function Intersection() {
     <div className="grid-and-instructions">
       <div className="grid">
         <div className="grid-item"></div>
+        {/* Crosswalk border for the north road */}
         <div
           className="grid-item"
           style={{
@@ -50,12 +46,15 @@ function Intersection() {
             }`,
           }}
         >
+          {/* North-Bound Light UI */}
           <div className="NB-light">
             <TrafficLight
               leftColor={lightState?.["north_left"]}
               primaryColor={lightState?.["north_straight"]}
             />
           </div>
+
+          {/* Maps each lane on the north road to a checkbox */}
           <div className="SB-traffic-sensors">
             {[
               {
@@ -94,6 +93,7 @@ function Intersection() {
           </div>
         </div>
         <div className="grid-item"></div>
+        {/* Crosswalk border for the west road */}
         <div
           className="grid-item"
           style={{
@@ -102,12 +102,14 @@ function Intersection() {
             }`,
           }}
         >
+          {/* West-Bound Light UI */}
           <div className="WB-light">
             <TrafficLight
               leftColor={lightState?.["east_left"]}
               primaryColor={lightState?.["east_straight"]}
             />
           </div>
+          {/* Maps each lane on the west road to a checkbox */}
           <div className="EB-traffic-sensors">
             {[
               {
@@ -154,6 +156,7 @@ function Intersection() {
             <i className="fa-solid fa-person-walking"></i>
           </div>
         </div>
+        {/* Crosswalk border for the easst road */}
         <div
           className="grid-item"
           style={{
@@ -162,12 +165,14 @@ function Intersection() {
             }`,
           }}
         >
+          {/* East-Bound Light UI */}
           <div className="EB-light">
             <TrafficLight
               leftColor={lightState?.["west_left"]}
               primaryColor={lightState?.["west_straight"]}
             />
           </div>
+          {/* Maps each lane on the east road to a checkbox */}
           <div className="WB-traffic-sensors">
             {[
               {
@@ -206,6 +211,7 @@ function Intersection() {
           </div>
         </div>
         <div className="grid-item"></div>
+        {/* Crosswalk border for the south road */}
         <div
           className="grid-item"
           style={{
@@ -214,12 +220,14 @@ function Intersection() {
             }`,
           }}
         >
+          {/* South-Bound Light UI */}
           <div className="SB-light">
             <TrafficLight
               leftColor={lightState?.["south_left"]}
               primaryColor={lightState?.["south_straight"]}
             />
           </div>
+          {/* Maps each lane on the south road to a checkbox */}
           <div className="NB-traffic-sensors">
             {[
               {
@@ -263,7 +271,7 @@ function Intersection() {
         <h1>Instructions:</h1>
         <p>
           Simulate the traffic intersection by clicking on a traffic sensor you
-          would like to trigger.
+          would like to toggle.
         </p>
 
         <h3>Features:</h3>
@@ -291,13 +299,13 @@ function Intersection() {
           </li>
           <li>
             <strong>
-              Each traffic phase includes timed "green," "yellow," and
+              Each traffic phase includes timed "green", "yellow", and
               "in-between" states,
             </strong>{" "}
             with the "in-between" phase ensuring safe transitions between
             signals.
           </li>
-          <li>Right turns yield to pedestrians</li>
+          <li><strong>Right turns yield</strong> to pedestrians</li>
         </ol>
       </div>
     </div>

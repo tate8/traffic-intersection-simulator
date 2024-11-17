@@ -10,6 +10,10 @@ type Sensors = Record<string, Sensor>;
 
 export type LightStates = Record<string, "green" | "red" | "yellow">;
 
+/**
+ * The IntersectionHandler takes in traffic sensor input and uses its onLightChange
+ * signal to notify observers of new traffic phases.
+ */
 export default class IntersectionHandler {
   private GREEN_DURATION = 4000;
   private YELLOW_DURATION = 1000;

@@ -1,4 +1,3 @@
-import './App.css'
 import Intersection from './components/Intersection'
 
 function App() {

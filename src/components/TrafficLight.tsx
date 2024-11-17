@@ -5,6 +5,11 @@ type TrafficLightProps = {
   primaryColor?: "green" | "red" | "yellow";
 };
 
+/**
+ * Component representing a traffic light. Each traffic light
+ * has a 2x3 grid. The first column shows the state of the left
+ * turn, and the second column the state of the straight or right turns
+ */
 function TrafficLight(props: TrafficLightProps) {
   return (
     <>
