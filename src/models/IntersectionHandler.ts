@@ -1,13 +1,12 @@
 import Signal from "./Signal";
 import { rulesMatrix } from "./Rules";
 
-
 type Sensor = {
   active: boolean;
   timestamp: number;
 };
-type Sensors = Record<string, Sensor>;
 
+type Sensors = Record<string, Sensor>;
 
 export type LightStates = Record<string, "green" | "red" | "yellow">;
 
@@ -35,6 +34,10 @@ export default class IntersectionHandler {
 
   private lightState: LightStates = { ...this.initialLightState };
 
+  /**
+   * Each sensor has an active flag and a timestamp of the last time it
+   * was changed
+   */
   private sensors: Sensors = {
     north_straight: { active: false, timestamp: Date.now() },
     north_left: { active: false, timestamp: Date.now() },
@@ -53,19 +56,25 @@ export default class IntersectionHandler {
     this.onLightChange.emit(this.lightState);
   }
 
+  /**
+   * Public method to be called when a sensor is changed
+   * @param sensor A string representing which sensor was changed. e.g. "north_straight"
+   * @param newValue The new value
+   */
   public sensorChange(sensor: string, newValue: boolean) {
     if (!Object.keys(this.sensors).some((key) => key === sensor)) {
       console.warn(`Sensor "${sensor}" does not exist.`);
       return;
     }
 
-    // update the sensors
+    // avoid duplicate timestamps
     let currentTime = Date.now();
     if (currentTime <= this.lastTimestamp) {
       currentTime = this.lastTimestamp + 1;
     }
     this.lastTimestamp = currentTime;
-
+    
+    // update the sensors
     this.sensors[sensor] = { active: newValue, timestamp: currentTime };
 
     // if there are no actions in progress, add the new one and schedule it
@@ -76,62 +85,10 @@ export default class IntersectionHandler {
     }
   }
 
-  private findOldestActiveSensor(sensors: Sensors) {
-    let oldestTimestamp = Infinity;
-    let oldestActiveSensor: string | null = null;
-
-    for (const [sensor, data] of Object.entries(sensors)) {
-      if (data.active === true && data.timestamp < oldestTimestamp) {
-        oldestTimestamp = data.timestamp;
-        oldestActiveSensor = sensor;
-      }
-    }
-      
-    console.log(`Oldest: ${oldestActiveSensor}, t: ${oldestTimestamp}`)
-
-    return oldestActiveSensor;
-  }
-
-  private buildPhaseFromSensor(primarySensor: string, sensors: Sensors) {
-    // calculate the compatible lights with the current sensor
-    // if there are multiple compatible configurations, pick the one
-    // with the lowest average active time to ensure queue-like behavior
-    const options = rulesMatrix[primarySensor].options;
-    // console.log(`All options for ${primarySensor}: ${options}\nGiven ${JSON.stringify(sensors, undefined, 2)}`)
-    const validOptions: string[][] = options.filter((phase) =>
-      phase.every((sensor) => sensors[sensor].active)
-    );
-    let minimumAverageDate = Infinity;
-    let minimumPhase: string[] = [];
-
-    for (const phase of validOptions) {
-      const averageDate =
-        phase.reduce((sum, sensor) => sum + sensors[sensor].timestamp, 0) /
-        phase.length;
-      if (averageDate < minimumAverageDate) {
-        minimumPhase = phase;
-        minimumAverageDate = averageDate;
-      }
-    }
-
-    // we didn't find any valid options, use default
-    if (minimumPhase.length === 0) {
-      return [primarySensor, ...rulesMatrix[primarySensor].default];
-    } else {
-      return [primarySensor, ...minimumPhase];
-    }
-  }
-
-  private getLightStatesFromPhase(phase: string[], sensors: Sensors) {
-    const states: LightStates = {};
-
-    for (const sensor of Object.keys(sensors)) {
-      states[sensor] = phase.includes(sensor) ? "green" : "red";
-    }
-
-    return states;
-  }
-
+  /**
+   * Starts a new traffic phase by determining which lights to turn on
+   * given the current sensor state. Transitions to yellow light after a delay
+   */
   private startNewPhase() {
     // increment the sensors to ensure that they won't get served immmediately
     // after if they remain pressed.
@@ -149,7 +106,7 @@ export default class IntersectionHandler {
       this.onLightChange.emit(this.initialLightState);
       return;
     }
-    console.log(oldestSensor);
+
     // build the phase based on the oldest sensor
     const phase = this.buildPhaseFromSensor(oldestSensor, this.sensors);
     this.currentPhaseActiveLights = phase
@@ -166,6 +123,10 @@ export default class IntersectionHandler {
     }
   }
 
+  /**
+   * Turns any green lights in the current phase to
+   * yellow. Ends the phase after a delay
+   */
   private transitionToYellow(): void {
     if (!this.currentPhase) return;
 
@@ -183,6 +144,10 @@ export default class IntersectionHandler {
     setTimeout(() => this.endCurrentPhase(), this.YELLOW_DURATION);
   }
 
+  /**
+   * Ends the current phase and starts a new one if there are any
+   * active sensors remaining.
+   */
   private endCurrentPhase(): void {
     if (!this.currentPhase) return;
 
@@ -202,5 +167,82 @@ export default class IntersectionHandler {
         this.currentPhase = null;
       }
     }, this.IN_BETWEEN_DURATION);
+  }
+
+  /**
+   * Searches through a Sensors object to find the one with the lowest timestamp
+   * @param sensors
+   */
+  private findOldestActiveSensor(sensors: Sensors) {
+    let oldestTimestamp = Infinity;
+    let oldestActiveSensor: string | null = null;
+
+    for (const [sensor, data] of Object.entries(sensors)) {
+      if (data.active === true && data.timestamp < oldestTimestamp) {
+        oldestTimestamp = data.timestamp;
+        oldestActiveSensor = sensor;
+      }
+    }
+      
+    console.log(`Oldest: ${oldestActiveSensor}, t: ${oldestTimestamp}`)
+
+    return oldestActiveSensor;
+  }
+
+  /**
+   * Determines which phase configuration should be executed according to
+   * the rules matrix given the current sensors state and a sensor that
+   * must be incorporated into the phase.
+   * @param primarySensor The sensor which will be present in the new phase
+   * @param sensors
+   * @returns The chosen phase
+   */
+  private buildPhaseFromSensor(primarySensor: string, sensors: Sensors) {
+    // calculate the compatible lights with the current sensor
+    // if there are multiple compatible configurations, pick the one
+    // with the lowest average active time to ensure queue-like behavior
+    const options = rulesMatrix[primarySensor].options;
+
+    // console.log(`All options for ${primarySensor}: ${options}\nGiven ${JSON.stringify(sensors, undefined, 2)}`)
+    const validOptions: string[][] = options.filter((phase) =>
+      phase.every((sensor) => sensors[sensor].active)
+    );
+    let minimumAverageDate = Infinity;
+    let minimumPhase: string[] = [];
+
+    // if multiple options are valid, choose the one with the lowest average date of its sensors
+    for (const phase of validOptions) {
+      const averageDate =
+        phase.reduce((sum, sensor) => sum + sensors[sensor].timestamp, 0) /
+        phase.length;
+      if (averageDate < minimumAverageDate) {
+        minimumPhase = phase;
+        minimumAverageDate = averageDate;
+      }
+    }
+
+    // we didn't find any valid options, use default
+    if (minimumPhase.length === 0) {
+      return [primarySensor, ...rulesMatrix[primarySensor].default];
+    } else {
+      return [primarySensor, ...minimumPhase];
+    }
+  }
+
+  /**
+   * Turns a list of active lights in a phase into a
+   * LightStates object
+   * @param phase A list of active lights
+   * @param sensors
+   * @returns The LightStates object
+   */
+  private getLightStatesFromPhase(phase: string[], sensors: Sensors) {
+    const states: LightStates = {};
+
+    for (const sensor of Object.keys(sensors)) {
+      states[sensor] = phase.includes(sensor) ? "green" : "red";
+    }
+
+    return states;
   }
 }
