@@ -1,36 +1,45 @@
 .container {
   display: flex;
+  gap: 1px;
 }
 
-.swap {
+.leftSection {
+  display: flex;
   flex-direction: column;
 }
 
-.swap .primary {
-  width: 15px;
-  height: 40px;
+.primarySection {
+  display: flex;
+  flex-direction: column;
 }
 
-.primary {
-  width: 40px;
-  height: 15px;
-  background-color: gray;
-}
-
-.left {
+.light {
   width: 15px;
   height: 15px;
   background-color: gray;
+  color: black;
 }
 
-.green {
-  background-color: green;
+.green-inactive {
+  background-color: rgb(2, 49, 2);
 }
 
-.yellow {
+.yellow-inactive {
+  background-color: rgb(59, 59, 3);
+}
+
+.red-inactive {
+  background-color: rgb(73, 1, 1);
+}
+
+.green-active {
+  background-color: rgb(0, 251, 0);
+}
+
+.yellow-active {
   background-color: yellow;
 }
 
-.red {
+.red-active {
   background-color: red;
 }

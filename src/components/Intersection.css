@@ -1,14 +1,29 @@
+html {
+  background-color: lightgray;
+}
+
+.grid-and-instructions {
+  display: flex;
+}
+
+.instructions {
+  max-width: 50vw;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  width: 500px;
-  height: 500px;
+  align-items: center;
+  justify-content: center;
+  width: 700px;
 }
 
 .grid-item {
  display: flex;
  justify-content: center;
  align-items: center;
+ position: relative;
+ aspect-ratio: 1;
 }
 
 .grid-item:nth-child(1) {
@@ -16,14 +31,30 @@
   border-bottom: 1px solid black;
 }
 
+.grid-item:nth-child(2) {
+  border-bottom: 10px dashed gray;
+}
+
 .grid-item:nth-child(3) {
   border-left: 1px solid black;
   border-bottom: 1px solid black;
 }
 
+.grid-item:nth-child(4) {
+  border-right: 10px dashed gray;
+}
+
+/* .grid-item:nth-child(6) {
+  border-left: 10px dashed gray;
+} */
+
 .grid-item:nth-child(7) {
   border-top: 1px solid black;
   border-right: 1px solid black;
+}
+
+.grid-item:nth-child(8) {
+  border-top: 10px dashed gray;
 }
 
 .grid-item:nth-child(9) {
@@ -38,23 +69,87 @@
 .NB-light {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 20%;
 }
 
 .SB-light {
   position: absolute;
-  left: 0;
   bottom: 0;
+  left: 20%
 }
 
 .EB-light {
   position: absolute;
-  bottom: 0;
   right: 0;
+  bottom: 20%;
 }
 
 .WB-light {
   position: absolute;
-  top: 0;
   left: 0;
+  top: 20%
+}
+
+.intersection-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+.SB-traffic-sensors {
+  position: absolute;
+  bottom: 0%;
+  left: 0;
+  font-size: 30px;
+  display: flex;
+  gap: 5px;
+  transform: rotate(180deg);
+}
+
+.NB-traffic-sensors {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 30px;
+  display: flex;
+  gap: 5px;
+}
+
+.WB-traffic-sensors {
+  position: absolute;
+  left: 0;
+  top: 60%;
+  font-size: 30px;
+  transform-origin: top left;
+  transform: rotate(-90deg);
+  display: flex;
+  gap: 5px;
+}
+
+.EB-traffic-sensors {
+  position: absolute;
+  bottom: 0%;
+  right: 30%;
+  font-size: 30px;
+  transform-origin: bottom right;
+  transform: rotate(90deg);
+  display: flex;
+  gap: 5px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.pedestrian {
+  position: absolute;
+  font-size: 20px;
+}
+
+.pedestrian_east {
+  right: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
 }
