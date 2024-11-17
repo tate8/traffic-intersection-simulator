@@ -79,10 +79,14 @@ function Intersection() {
               },
             ].map((data, index) => (
               <div className="column" key={index}>
-                <input
-                  type="checkbox"
-                  onChange={(e) => changeSensor(data.sensor, e.target.checked)}
-                />
+                {index !== 1 && index !== 3 && (
+                  <input
+                    type="checkbox"
+                    onChange={(e) =>
+                      changeSensor(data.sensor, e.target.checked)
+                    }
+                  />
+                )}
                 <i
                   className={`fa-solid ${data.icon} ${
                     data.condition === "green" ? "green-active" : ""
@@ -134,10 +138,14 @@ function Intersection() {
               },
             ].map((data, index) => (
               <div className="column" key={index}>
-                <input
-                  type="checkbox"
-                  onChange={(e) => changeSensor(data.sensor, e.target.checked)}
-                />
+                {index !== 1 && index !== 3 && (
+                  <input
+                    type="checkbox"
+                    onChange={(e) =>
+                      changeSensor(data.sensor, e.target.checked)
+                    }
+                  />
+                )}
                 <i
                   className={`fa-solid ${data.icon} ${
                     data.condition === "green" ? "green-active" : ""
@@ -197,10 +205,14 @@ function Intersection() {
               },
             ].map((data, index) => (
               <div className="column" key={index}>
-                <input
-                  type="checkbox"
-                  onChange={(e) => changeSensor(data.sensor, e.target.checked)}
-                />
+                {index !== 1 && index !== 3 && (
+                  <input
+                    type="checkbox"
+                    onChange={(e) =>
+                      changeSensor(data.sensor, e.target.checked)
+                    }
+                  />
+                )}
                 <i
                   className={`fa-solid ${data.icon} ${
                     data.condition === "green" ? "green-active" : ""
@@ -252,10 +264,14 @@ function Intersection() {
               },
             ].map((data, index) => (
               <div className="column" key={index}>
-                <input
-                  type="checkbox"
-                  onChange={(e) => changeSensor(data.sensor, e.target.checked)}
-                />
+                {index !== 1 && index !== 3 && (
+                  <input
+                    type="checkbox"
+                    onChange={(e) =>
+                      changeSensor(data.sensor, e.target.checked)
+                    }
+                  />
+                )}
                 <i
                   className={`fa-solid ${data.icon} ${
                     data.condition === "green" ? "green-active" : ""
@@ -291,7 +307,7 @@ function Intersection() {
           </li>
           <li>
             <strong>Pedestrian traffic phases are longer than default</strong>{" "}
-            to accomodate the time it takes to walk across the intersection
+            to accomodate the time it takes to walk across the intersection.
           </li>
           <li>
             <strong>If multiple sensors are triggered quickly,</strong> the
@@ -305,7 +321,9 @@ function Intersection() {
             with the "in-between" phase ensuring safe transitions between
             signals.
           </li>
-          <li><strong>Right turns yield</strong> to pedestrians</li>
+          <li>
+            <strong>Right turn sensors</strong> follow the same rules as straight ones.
+          </li>
         </ol>
       </div>
     </div>
