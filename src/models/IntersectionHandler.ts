@@ -1,70 +1,6 @@
 import Signal from "./Signal";
+import { rulesMatrix } from "./Rules";
 
-const conflictMatrix: ConflictMatrix = {
-  north_straight: {
-    default: ["south_straight"],
-    options: [
-      ["north_left"],
-      ["pedestrian_east", "north_left"],
-      // If east and/or west pedestrian active
-      ["pedestrian_east"],
-      ["pedestrian_west"],
-      ["pedestrian_east", "pedestrian_west"],
-    ],
-  },
-  north_left: {
-    default: ["south_left"],
-    options: [
-      ["north_straight"],
-      ["pedestrian_east"],
-      ["north_straight", "pedestrian_east"],
-    ],
-  },
-  south_straight: {
-    default: ["north_straight"],
-    options: [
-      ["south_left"],
-      ["pedestrian_west"],
-      ["pedestrian_west", "south_left"],
-    ],
-  },
-  south_left: {
-    default: ["north_left"],
-    options: [
-      ["south_straight"],
-      ["pedestrian_west"],
-      ["south_straight", "pedestrian_west"],
-    ],
-  },
-  pedestrian_east: {
-    default: ["pedestrian_west"],
-    options: [
-      ["north_left"],
-      ["north_straight", "north_left"],
-      ["north_straight", "south_straight"],
-      ["north_straight"],
-      ["south_straight"],
-    ],
-  },
-  pedestrian_west: {
-    default: ["pedestrian_east"],
-    options: [
-      ["south_left"],
-      ["south_straight", "south_left"],
-      ["south_straight", "north_straight"],
-      ["south_straight"],
-      ["north_straight"],
-    ],
-  },
-  // pedestrian_north: {
-  //   default: ["pedestrian_south"],
-  //   options: [["north_left"], ["north_straight",  "north_left"], ["north_straight", "south_straight"], ["north_straight"], ["south_straight"]]
-  // },
-  // pedestrian_south: {
-  //   default: ["pedestrian_east"],
-  //   options: [["south_left"], ["south_straight",  "south_left"], ["south_straight", "north_straight"], ["south_straight"], ["north_straight"]]
-  // }
-};
 
 type Sensor = {
   active: boolean;
@@ -72,11 +8,6 @@ type Sensor = {
 };
 type Sensors = Record<string, Sensor>;
 
-type ConflictMatrixEntry = {
-  default: string[];
-  options: string[][];
-};
-type ConflictMatrix = Record<string, ConflictMatrixEntry>;
 
 export type LightStates = Record<string, "green" | "red" | "yellow">;
 
@@ -87,6 +18,7 @@ export default class IntersectionHandler {
   private PEDESTRIAN_DURATION = 6000;
 
   private currentPhase: LightStates | null = null;
+  private currentPhaseActiveLights: string[] | null = null
   private lastTimestamp: number = 0;
 
   private initialLightState: LightStates = {
@@ -94,10 +26,11 @@ export default class IntersectionHandler {
     north_left: "red",
     south_straight: "red",
     south_left: "red",
-    pedestrian_east: "red",
-    pedestrian_west: "red",
-    pedestrian_north: "red",
-    pedestrian_south: "red",
+    east_straight: "red",
+    east_left: "red",
+    west_straight: "red",
+    west_left: "red",
+    pedestrian: "red",
   };
 
   private lightState: LightStates = { ...this.initialLightState };
@@ -107,10 +40,11 @@ export default class IntersectionHandler {
     north_left: { active: false, timestamp: Date.now() },
     south_straight: { active: false, timestamp: Date.now() },
     south_left: { active: false, timestamp: Date.now() },
-    pedestrian_east: { active: false, timestamp: Date.now() },
-    pedestrian_west: { active: false, timestamp: Date.now() },
-    pedestrian_north: { active: false, timestamp: Date.now() },
-    pedestrian_south: { active: false, timestamp: Date.now() },
+    pedestrian: { active: false, timestamp: Date.now() },
+    east_left: { active: false, timestamp: Date.now() },
+    east_straight: { active: false, timestamp: Date.now() },
+    west_left: { active: false, timestamp: Date.now() },
+    west_straight: { active: false, timestamp: Date.now() },
   };
 
   public onLightChange = new Signal<LightStates>();
@@ -152,6 +86,8 @@ export default class IntersectionHandler {
         oldestActiveSensor = sensor;
       }
     }
+      
+    console.log(`Oldest: ${oldestActiveSensor}, t: ${oldestTimestamp}`)
 
     return oldestActiveSensor;
   }
@@ -160,7 +96,7 @@ export default class IntersectionHandler {
     // calculate the compatible lights with the current sensor
     // if there are multiple compatible configurations, pick the one
     // with the lowest average active time to ensure queue-like behavior
-    const options = conflictMatrix[primarySensor].options;
+    const options = rulesMatrix[primarySensor].options;
     // console.log(`All options for ${primarySensor}: ${options}\nGiven ${JSON.stringify(sensors, undefined, 2)}`)
     const validOptions: string[][] = options.filter((phase) =>
       phase.every((sensor) => sensors[sensor].active)
@@ -180,7 +116,7 @@ export default class IntersectionHandler {
 
     // we didn't find any valid options, use default
     if (minimumPhase.length === 0) {
-      return [primarySensor, ...conflictMatrix[primarySensor].default];
+      return [primarySensor, ...rulesMatrix[primarySensor].default];
     } else {
       return [primarySensor, ...minimumPhase];
     }
@@ -197,6 +133,17 @@ export default class IntersectionHandler {
   }
 
   private startNewPhase() {
+    // increment the sensors to ensure that they won't get served immmediately
+    // after if they remain pressed.
+    if (this.currentPhaseActiveLights) {
+      const currentTime = Date.now();
+      this.currentPhaseActiveLights.forEach((sensor) => {
+        if (this.sensors[sensor]) {
+          this.sensors[sensor].timestamp = currentTime;
+        }
+      });
+    }
+
     const oldestSensor = this.findOldestActiveSensor(this.sensors);
     if (!oldestSensor) {
       this.onLightChange.emit(this.initialLightState);
@@ -205,15 +152,7 @@ export default class IntersectionHandler {
     console.log(oldestSensor);
     // build the phase based on the oldest sensor
     const phase = this.buildPhaseFromSensor(oldestSensor, this.sensors);
-
-    // increment the sensors to ensure that they won't get served immmediately
-    // after if they remain pressed.
-    const currentTime = Date.now();
-    phase.forEach((sensor) => {
-      if (this.sensors[sensor]) {
-        this.sensors[sensor].timestamp = currentTime;
-      }
-    });
+    this.currentPhaseActiveLights = phase
 
     // get light states based on the phase
     const lightStates = this.getLightStatesFromPhase(phase, this.sensors);

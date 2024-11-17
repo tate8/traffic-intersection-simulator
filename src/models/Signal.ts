@@ -10,10 +10,10 @@ export default class Signal<T> {
   }
 
   disconnect(callback: (arg: T) => void) {
-    this.observers = this.observers.filter(e => e != callback);
- }
+    this.observers = this.observers.filter((e) => e != callback);
+  }
 
   emit(arg: T) {
-    this.observers.forEach(e => e(arg));
+    this.observers.forEach((e) => e(arg));
   }
 }
