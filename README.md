@@ -2,11 +2,12 @@
 
 ### DEMO HERE: https://traffic-intersection-eight.vercel.app
 
-**Run yourself**
+###### Run yourself
 * Clone this repo
 * npm install
 * npm run dev
-**Code location**
+  
+###### Code location
 Most of the code I wrote is in the src/components and src/models directories
 
 # Overview
