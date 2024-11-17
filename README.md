@@ -21,7 +21,7 @@ The IntersectionHandler class (located in src/models/IntersectionHandler.ts) mod
 The class also includes a method to toggle traffic sensors. Based on the sensors' activation order and status, the model determines a valid configuration for the traffic lights, ensuring it prioritizes older requests and avoids conflicts. For instance:
 
 * If only the north_left and north_straight sensors are active, both will be served.
-* *owever, if the south_straight sensor was activated before the north_left sensor, the model will prioritize south_straight and north_left.*
+* However, if the south_straight sensor was activated before the north_left sensor, the model will prioritize south_straight and north_left.
 
 #### View
 The Intersection component (located in src/components/Intersection.tsx) shows the current state of the traffic intersection and allows the user to
