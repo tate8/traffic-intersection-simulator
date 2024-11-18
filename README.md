@@ -12,7 +12,7 @@ Most of the code I wrote is in the src/components and src/models directories
 
 # Overview
 I implemented a program that models a traffic intersection. With vanilla TypeScript and React I was able to implement a solution with clear separation
-of concerns. In this case, the view (a React component) doesn't have to worry about how the model (A TypeScript class) works and vice-versa. The nice thing about this way of implementing it is that with more time you could make the view look a lot better. For example, you could animate real cars going through the traffic stop and toggle sensors when the cars overlap with them. I spent closer to 8 hours than 4 on this.
+of concerns. In this case, the view (a React component) doesn't have to worry about how the model (A TypeScript class) works and vice-versa. The nice thing about this way of implementing it is that with more time you could make the view look a lot better. For example, you could animate real cars going through the traffic stop and toggle sensors when the cars overlap with them.
 
 ## Approach / Implementation
 My overall approach used the Model View Controller (MVC) architectural pattern to have the clearest separation of concerns possible.
